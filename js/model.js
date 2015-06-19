@@ -332,10 +332,7 @@
                     ip = ip_port[0];
                     port = ip_port[1];
                 }
-                script += 'return "PROXY ' + ip + ':'+ port +'; DIRECT";';
-
-                script+="\n";
-
+                script += 'return "PROXY ' + ip + ':'+ port +'";';
             }
             var data='function FindProxyForURL(url,host){' + 
                 'if(shExpMatch(url,"http:*")){' + 
