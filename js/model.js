@@ -308,7 +308,7 @@
         this.checked = checked;
 
         var script = '';
-
+        
         if (this.checked) {
 
             var results=model.getEnabledHosts();
@@ -337,9 +337,14 @@
                 script+="\n";
 
             }
-            var data='function FindProxyForURL(url,host){ \n if(shExpMatch(url,"http:*")){if(isPlainHostName(host)){return "DIRECT";' +
-                script + '}else{return "DIRECT";}}else{return "DIRECT";}}';
-
+            var data='function FindProxyForURL(url,host){' + 
+                'if(shExpMatch(url,"http:*")){' + 
+                     'if(isPlainHostName(host)){' + 
+                          'return "DIRECT";' +
+                      script + 
+                      '} else {return "DIRECT";}' +
+                  '}else{return "DIRECT";}' + 
+                '}';
 
             chrome.proxy.settings.set({
                 value: {
