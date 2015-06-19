@@ -336,8 +336,7 @@
             }
             var data='function FindProxyForURL(url,host){' + 
                 'if(shExpMatch(url,"http:*")){' + 
-                     'if(isPlainHostName(host)){' + 
-                          'return "DIRECT";' +
+                     'if(false){' + // 去掉isPlainHostName(host)限制，没必要
                       script + 
                       '} else {return "DIRECT";}' +
                   '}else{return "DIRECT";}' + 
