@@ -335,20 +335,22 @@
                 /**
                  * @author pugwoo
                  * info.domain扩展为:
-                 * 1. 如果http:开头，则使用shExpMatch匹配url，此时请写清楚*匹配符
+                 * 1. 如果http:或https:开头，则使用shExpMatch匹配url，此时请写清楚*匹配符
                  * 2. 如果值只是host形式（等价于没有带/），包括星号格式，那么匹配host
                  *    如果填入google.com，那么不会匹配所有子域名，请用*.google.com
-                 * 3. 如果不是上面两种，那么匹配http的url方式
+                 * 3. 如果不是上面两种，那么匹配http和https的url方式
                  */
                 var domain = info.domain;
-                if(domain.indexOf('http://') == 0) {
+                if(domain.indexOf('http://') == 0 || domain.indexOf('https://') == 0) {
                 	script += '}else if(shExpMatch(url,"' + 
                 	          autoAppendWildcard(appendSlash(domain)) + '")){';
                 } else if (domain.indexOf('/') < 0) {
                 	script += '}else if(shExpMatch(host,"' + domain + '")){';
                 } else {
                 	var _domain = autoAppendWildcard(domain);
-                	script += '}else if(shExpMatch(url,"http://' + _domain + '")){';
+                	script += '}else if(shExpMatch(url,"http://' + _domain +
+                	          '") || shExpMatch(url,"https://' + _domain + 
+                	       '")){';
                 }
 
                 /**
@@ -379,7 +381,7 @@
             }
             
             var data='function FindProxyForURL(url,host){' + 
-                'if(shExpMatch(url,"http:*")){' + 
+                'if(shExpMatch(url,"http:*") || shExpMatch(url,"https:*")){' + 
                      'if(false){' + // 去掉isPlainHostName(host)限制，没必要
                       script + 
                       '} else {return "DIRECT";}' +
