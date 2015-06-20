@@ -269,7 +269,7 @@ function render_search_result(result, isBulk) {
         html = '<tr><td colspan="6">No Results</td></tr>';
     } else {
         $(result).each(function (i, v) {
-            v.tags = v.tags ? (v.tags.join(', ')) : '';
+            v.tags = v.tags ? (v.tags.join(',')) : '';
             v.status_class = v.status ? 'status-enabled' : 'status-disabled';
         });
         html = $('#host-item').extendObj(result);
