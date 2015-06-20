@@ -301,6 +301,23 @@
     model.reload=function(){
         model.setStatus(loadData('status'));
     }
+    
+    // 如果url是http://或https://后面带上的url没有带/，则加上
+    function appendSlash(url) {
+    	var pureurl = url;
+    	if(url.indexOf('http://') == 0) {
+    		pureurl = url.substr(7);
+    	} else if(url.indexOf('https://') == 0) {
+    		pureurl = url.substr(8);
+    	}
+    	return pureurl.indexOf('/') < 0 ? url + '/' : url;
+    }
+    
+    // 当url以/结尾时，自动加上*号
+    function autoAppendWildcard(url) {
+    	return url.lastIndexOf('/') == url.length - 1 ?
+    			url + '*' : url;
+    }
 
     //开关,启用暂停
     model.setStatus = function (checked) {
@@ -314,26 +331,53 @@
             var results=model.getEnabledHosts();
             for(var i =0;i<results.length;i++){
                 var info=results[i];
-                var ip = info.ip;
-                var port = 80;
 
-                if(info.domain.indexOf('*')!=-1){
-                    script += '}else if(shExpMatch(host,"' + info.domain + '")){';
-                }else if(info.domain.indexOf(':')!=-1){
-                    var t=info.domain.split(':');
-                    port = t[1];
-                    script += '}else if(shExpMatch(url,"http://' + info.domain + '/*")){';
-                }else{
-                    script += '}else if(host == "' + info.domain + '"){';
+                /**
+                 * @author pugwoo
+                 * info.domain扩展为:
+                 * 1. 如果http:开头，则使用shExpMatch匹配url，此时请写清楚*匹配符
+                 * 2. 如果值只是host形式（等价于没有带/），包括星号格式，那么匹配host
+                 *    如果填入google.com，那么不会匹配所有子域名，请用*.google.com
+                 * 3. 如果不是上面两种，那么匹配http的url方式
+                 */
+                var domain = info.domain;
+                if(domain.indexOf('http://') == 0) {
+                	script += '}else if(shExpMatch(url,"' + 
+                	          autoAppendWildcard(appendSlash(domain)) + '")){';
+                } else if (domain.indexOf('/') < 0) {
+                	script += '}else if(shExpMatch(host,"' + domain + '")){';
+                } else {
+                	var _domain = autoAppendWildcard(domain);
+                	script += '}else if(shExpMatch(url,"http://' + _domain + '")){';
                 }
 
-                if( info.ip.indexOf(':') !== -1 ){
-                    var ip_port = info.ip.split(':');
+                /**
+                 * @author pugwoo
+                 * 扩展为：ip如果是SOCKS开头的话，那么代理服务器以SOCKS5为开头，目前只支持socks5，socks4实在没必要
+                 * 如果ip是PROXY或HTTP开头，那么代理服务器以PROXY开头，
+                 * 默认以PROXY开头
+                 */
+                var ip = info.ip;
+                var proxyType = 'PROXY';
+                if(ip.indexOf('SOCKS') == 0) {
+                	proxyType = 'SOCKS5';
+                	ip = ip.substr(5);
+                } else if (ip.indexOf('PROXY') == 0) {
+                	proxyType = 'PROXY';
+                	ip = ip.substr(5);
+                } else if (ip.indexOf('HTTP') == 0) {
+                	proxyType = 'PROXY';
+                	ip = ip.substr(4);
+                }
+                var port = 80;
+                if(ip.indexOf(':') !== -1){
+                    var ip_port = ip.split(':');
                     ip = ip_port[0];
                     port = ip_port[1];
                 }
-                script += 'return "PROXY ' + ip + ':'+ port +'";';
+                script += 'return "' + proxyType + ' ' + ip + ':'+ port +'";';
             }
+            
             var data='function FindProxyForURL(url,host){' + 
                 'if(shExpMatch(url,"http:*")){' + 
                      'if(false){' + // 去掉isPlainHostName(host)限制，没必要
@@ -341,7 +385,7 @@
                       '} else {return "DIRECT";}' +
                   '}else{return "DIRECT";}' + 
                 '}';
-
+            
             chrome.proxy.settings.set({
                 value: {
                     mode: 'pac_script',
