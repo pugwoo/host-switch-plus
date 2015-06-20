@@ -331,6 +331,9 @@
             var results=model.getEnabledHosts();
             for(var i =0;i<results.length;i++){
                 var info=results[i];
+                
+                // XXX 【注意】目前不支持https绑hosts的方式，因为https的443不会兼容作为http代理
+                // 对于这种情况，还是需要修改系统hosts文件，有这样的chrome插件完成这个事
 
                 /**
                  * @author pugwoo
@@ -367,7 +370,10 @@
                 } else if (ip.indexOf('PROXY') == 0) {
                 	proxyType = 'PROXY';
                 	ip = ip.substr(5);
-                } else if (ip.indexOf('HTTP') == 0) {
+                } else if (ip.indexOf('HTTPS') == 0) {
+                	proxyType = 'HTTPS';
+                	ip = ip.substr(5);
+                } else if (ip.indexOf('HTTP') == 0) { 
                 	proxyType = 'PROXY';
                 	ip = ip.substr(4);
                 }
