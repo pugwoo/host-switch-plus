@@ -171,7 +171,7 @@ $(function () {
                             id: $item.data('id'),
                             ip: $item.data('ip'),
                             domain: $item.data('domain'),
-                            tag: $item.find('.tags').text().split(', '),
+                            tag: $item.find('.tags').text().split(','),
                             note: $item.find('.note').text()
                         }
                         var $addForm = $('#addForm');
