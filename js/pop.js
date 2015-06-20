@@ -2,26 +2,6 @@
  * Created by sdm on 14-1-18.
  * Updated by Riant at 2015-04-16
  */
-
-function search(kw) {
-    if( kw === '' ) $('#input_search').val('');
-
-    kw = kw || $('#input_search').val();
-    var result = model.search(kw);
-    //显示
-    render_search_result(result);
-}
-
-var model = window.Model;
-$(function () {
-    var last_search = model.getkws();
-    var kws = []
-    $(model.getkws()).each(function (i, v) {
-        kws.push({'kw': v});
-    });
-
-    setTimeout(search);
-
     function render_label_filter() {
         var tags = model.countTags();
         //标签过滤
@@ -43,6 +23,26 @@ $(function () {
         labels.html('<a href="#" data-tag="" class="action">All('+ total +')</a>'+ labels_html);
         div_labels.html(label_checks);
     }
+    
+function search(kw) {
+    if( kw === '' ) $('#input_search').val('');
+
+    kw = kw || $('#input_search').val();
+    var result = model.search(kw);
+    //显示
+    render_search_result(result);
+    render_label_filter();
+}
+
+var model = window.Model;
+$(function () {
+    var last_search = model.getkws();
+    var kws = []
+    $(model.getkws()).each(function (i, v) {
+        kws.push({'kw': v});
+    });
+
+    setTimeout(search);
 
     var labels = $('#label-filter');
 
