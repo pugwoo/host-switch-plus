@@ -213,6 +213,16 @@
         return hosts;
     }
 
+    model.countTotal = function() {
+    	var hosts = loadData('hosts');
+    	var count = 0;
+        for (var i in hosts) {
+            if (hosts.hasOwnProperty(i)) {
+            	count++;
+            }
+        }
+        return count;
+    }
 
     /**
      * 获取标签的统计

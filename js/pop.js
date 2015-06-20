@@ -29,7 +29,7 @@ $(function () {
 
         //添加 host 表单
         var div_labels = $('#div_labels');
-        var total = 0;
+        var total = model.countTotal();
         var labels_html = '',
             label_checks = '';
 
@@ -37,7 +37,6 @@ $(function () {
 
         for (var i = 0; i < tags.length; i++) {
             var tag = tags[i];
-            total += tag.count;
             labels_html += '<a href="#" data-tag="' + tag.name + '">' + tag.name + '(' + tag.count + ')</a>';
             label_checks += '<label class="checkbox"><input type="checkbox" name="labels[]" value="' + tag.name + '">' + tag.name + '</label>';
         }
