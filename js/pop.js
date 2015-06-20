@@ -273,6 +273,6 @@ function render_search_result(result, isBulk) {
             v.status_class = v.status ? 'status-enabled' : 'status-disabled';
         });
         html = $('#host-item').extendObj(result);
-        tbody.html( html );
     }
+    tbody.html( html );
 }
