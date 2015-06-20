@@ -220,7 +220,7 @@
      */
     model.countTags = function () {
         var tags = {
-            'prod': 0,
+            'common': 0,
             'dev': 0,
             'test': 0
         }
