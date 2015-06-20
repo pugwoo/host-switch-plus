@@ -79,6 +79,7 @@ $(function () {
                         var domain = $(this).data('domain');
                         var domain_enabled = enabled_domains[domain];
 
+                        // 这个if逻辑好像没用？XXX
                         if( domain_enabled && ! $('#host-' + domain_enabled).length )
                             dis_ids.push(domain_enabled);
 
@@ -89,10 +90,14 @@ $(function () {
                         this_ds[domain] = $(this).data('id');
                     });
 
-
                     if( dis_ids.length ){
                         model.disableHosts(dis_ids);
                     }
+                    
+                    if(tag && tag != 'common') {
+                    	model.disableTagExcept([tag, 'common']);
+                    }
+                    
                     model.enableHosts(ids);
                 } else {
                     trs.each(function(){

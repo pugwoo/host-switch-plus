@@ -253,50 +253,17 @@
         return loadData('status') ? loadData('status') : 0;
     }
 
+    // 查询当前生效的所有hosts
     model.getEnabledHosts=function(){
         var results=[];
-        var hosts=model.getHosts();
-        //别名问题
-        var map={};
-        var is_ip=new RegExp('([0-9]+\.)+[0-9]+');
-        var is_hostname=new RegExp('([^\. ]+)');//比如web1 web2 web-3 非域名
-        //别名记录
-        var host_alisa={};
-        var result_map={};
-
-        //分析别名
-        $(hosts).each(function(i,v){
-            if(v.status==1){
-                if(is_ip.test(v.ip) && is_hostname.test(v.domain)){
-                    host_alisa[v.domain]= v.ip + '[@]' + v.id;
-                    result_map[v.domain]= v.ip + '[@]' + v.id;
-                }
-            }
+        $(model.getHosts()).each(function(i,v){
+        	if(v.status == 1) {
+        		results.push(v);
+        	}
         });
-
-        $(hosts).each(function(i,v){
-            if(v.status==1){
-                //使用了别名
-                if(!is_ip.test(v.ip) && is_hostname.test(v.ip) && host_alisa[v.ip]){
-                    result_map[v.domain]=host_alisa[v.ip];
-                }else if( is_ip.test(v.ip)){
-                    result_map[v.domain]= v.ip + '[@]' + v.id;
-                }else{
-                    console.log('err:',i,v)
-                }
-            }
-        })
-
-        for(var d in result_map){
-            if(result_map.hasOwnProperty(d)){
-                var ip_id = result_map[d].split('[@]');
-                results.push({domain:d, ip:ip_id[0], id: ip_id[1]});
-            }
-        }
-
         return results;
     }
-
+    
     //重新加载
     model.reload=function(){
         model.setStatus(loadData('status'));
@@ -426,7 +393,6 @@
     }
 
     model.enableHosts = function (ids) {
-
         var hosts = loadData('hosts');
         for (var i = 0; i < ids.length; i++) {
             if (hosts[ids[i]]) {
@@ -437,6 +403,7 @@
         saveData('hosts', hosts);
         model.reload();
     }
+    
     model.disableHosts = function (ids) {
         var hosts = loadData('hosts');
         for (var i = 0; i < ids.length; i++) {
@@ -445,6 +412,35 @@
             }
         }
 
+        saveData('hosts', hosts);
+        model.reload();
+    }
+    
+    // 禁用掉除了指定tag之外的所有配置，特别的，当tags包含空字符串时表示没有tag的配置不disable
+    model.disableTagExcept = function(tags) {
+    	var hosts = loadData('hosts');
+    	for(var key in hosts) {
+    		if(hosts.hasOwnProperty(key)) {
+    			var disable = true;
+    			for(var i = 0; i < tags.length; i++) {
+    				if(tags[i] == '') {
+    					if(hosts[key].tags.length == 0) {
+        					disable = false;
+        					break;
+    					}
+    				} else {
+    					if(hosts[key].tags.indexOf(tags[i]) >= 0) {
+    						disable = false;
+    						break;
+    					}
+    				}
+    			}
+    			if(disable) {
+    				hosts[key].status = 0;
+    			}
+    		}
+    	}
+    	
         saveData('hosts', hosts);
         model.reload();
     }
