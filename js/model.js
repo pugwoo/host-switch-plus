@@ -306,6 +306,12 @@
         if (this.checked) {
 
             var results=model.getEnabledHosts();
+            
+            // url优先级简单的按字符串长度决定，字符串越长优先级越高，这样可以满足大部分需求
+            results = results.slice().sort(function(a,b){
+            	return b.domain.length - a.domain.length;
+            });
+            
             for(var i =0;i<results.length;i++){
                 var info=results[i];
                 
