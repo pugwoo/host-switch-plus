@@ -114,6 +114,7 @@ $(function () {
             // }
         } else { // 展示
         	model.setCurTag(tag);
+        	chrome.browserAction.setBadgeText({text: tag ? tag : "ALL"});
             if( tag ){
                 var kw = $('#input_search').val();
                 var kws = kw.split(/\s+/);
