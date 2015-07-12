@@ -41,6 +41,12 @@ $(function () {
         }
         labels.html('<a href="#" data-tag="" class="action">All('+ total +')</a>'+ labels_html);
         div_labels.html(label_checks);
+        
+        // XXX 目前还不知道打开popup.html页面时，是哪个地方触发了search(kw)这个function
+        var tag = model.getCurTag();
+        if(tag) { // 因为默认就是tag为空的触发一次click，所以这里不需要
+        	$('#label-filter').find("a[data-tag=" + tag +"]").click();
+        }
     }
 
     var labels = $('#label-filter');
@@ -48,13 +54,14 @@ $(function () {
     labels.on('click', 'a', function () {
         var tag = $(this).data('tag'),
             s = '';
-        if( $(this).is('.action') ){
+        if( $(this).is('.action') ){ // 如果该tag已经是点中状态，那么根据当前状态来全部选择或全部取消
             if( labels.is('.noBulk') ) return false;
             // if( tag ){
                 var ids = [],
                     all_action = true;
                 var trs = $('#tbody-hosts').children();
 
+                // 只要当前tag中有一个host没选中，那么all_action=false
                 $('#tbody-hosts').find('.host-status').each(function(){
                     if( ! $(this).data('status') ){
                         all_action = false;
@@ -62,7 +69,7 @@ $(function () {
                     }
                 });
 
-                if( ! all_action ){
+                if( ! all_action ){ // 把tag所有的host全部选中上
                     var this_ds = {};
 
                     var enables = model.getEnabledHosts(),
@@ -105,7 +112,8 @@ $(function () {
                 }
                 render_status(ids, ! all_action, true);
             // }
-        } else {
+        } else { // 展示
+        	model.setCurTag(tag);
             if( tag ){
                 var kw = $('#input_search').val();
                 var kws = kw.split(/\s+/);

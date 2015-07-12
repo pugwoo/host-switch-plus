@@ -460,6 +460,15 @@
         saveData('hosts', hosts);
         model.reload();
     }
+    
+    // 记录或查询当前tag
+    model.setCurTag = function (tag) {
+    	saveData('tag', tag);
+    }
+    
+    model.getCurTag = function () {
+    	return loadData('tag');
+    }
 
     model.updateHost = function (info) {
         var hosts = loadData('hosts');
