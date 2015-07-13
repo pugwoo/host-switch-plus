@@ -104,17 +104,18 @@ $(function () {
                     }
                     
                     model.enableHosts(ids);
+                    chrome.browserAction.setBadgeText({text: tag ? tag : "ALL"});
                 } else {
                     trs.each(function(){
                         ids[ids.length] = $(this).data('id');
                     });
                     model.disableHosts(ids);
+                    chrome.browserAction.setBadgeText({text: "none"});
                 }
                 render_status(ids, ! all_action, true);
             // }
         } else { // 展示
         	model.setCurTag(tag);
-        	chrome.browserAction.setBadgeText({text: tag ? tag : "ALL"});
             if( tag ){
                 var kw = $('#input_search').val();
                 var kws = kw.split(/\s+/);
